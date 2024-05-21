@@ -37,7 +37,8 @@ def player(board):
                 num_X += 1
             elif i == O:
                 num_O += 1
-    if num_O > num_X:
+    #print(num_O,num_X)
+    if num_O < num_X:
         return O
     return X
 
@@ -47,12 +48,13 @@ def actions(board):
     Returns set of all possible actions (i, j) available on the board.
     search for where board = empyty
     """
-    set_Of_Possible_Values = []
+    set_Of_Possible_Values = set()
     for i in range(len(board)):
             for j in range(len(board[i])):     
                 if board[i][j] == EMPTY:
                     tuple = (i,j)
-                    set_Of_Possible_Values.append(tuple)
+                    set_Of_Possible_Values.add(tuple)
+    #print(set_Of_Possible_Values)
     return set_Of_Possible_Values
 
 
@@ -61,10 +63,11 @@ def result(board, action):
     Returns the board that results from making move (i, j) on the board.
     find action if not allowed raise exection return updated board state
     """
-    if board[action[0]][action[1]] != EMPTY:
+    i, j = action
+    if board[i][j] != EMPTY or 0 > i or i > 2 or 0 > j  or j > 2:
         raise Exception("Not Valid Move")
     
-    tempBoard = board
+    tempBoard = [row[:] for row in board]
     turn = player(tempBoard)
 
     tempBoard[action[0]][action[1]] = turn
@@ -117,11 +120,11 @@ def terminal(board):
     Returns True if game is over, False otherwise.
     call winner if not none check if all full
     """
-    if (winner(board) != None):
+    if (winner(board) is not None):
         return True
-    for row in range(len(board)):
-        for column in range(len(row)):
-            if board[row][column] == EMPTY:
+    for row in board:
+        #print(row)
+        if EMPTY in row:
                 return False
 
     return True
@@ -132,10 +135,10 @@ def utility(board):
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     use winner if returns x = 1 etc.
     """
-    winner = winner(board)
-    if winner == X:
+    win = winner(board)
+    if win == X:
         return 1
-    elif winner == O:
+    elif win == O:
         return -1
     return 0
 
@@ -160,4 +163,41 @@ def minimax(board):
         v = MIN(v, MAX-VALUE(RESULT(state, action)))
         return v
     """
-    raise NotImplementedError
+    if terminal(board):
+        return None
+    whos_Turn = player(board)
+
+    if whos_Turn == X:
+        best_V = -math.inf
+        best_Move = None
+        for action in actions(board):
+            v = min_Val(result(board,action))
+            if v > best_V:
+                best_V = v
+                best_Move = action
+    else:
+        best_V = math.inf
+        best_Move = None
+        for action in actions(board):
+            v = max_Val(result(board,action))
+            if v < best_V:
+                best_V = v
+                best_Move = action
+    return best_Move
+
+def max_Val(state):
+    if terminal(state):
+        return utility(state)
+    v = -math.inf
+    for action in actions(state):
+        #print(action)
+        v = max(v,min_Val(result(state,action)))
+    return v
+def min_Val(state):
+    if terminal(state):
+        return utility(state)
+    v = math.inf
+    for action in actions(state):
+        #print(action)
+        v = min(v,max_Val(result(state,action)))
+    return v
