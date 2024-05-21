@@ -102,13 +102,19 @@ def shortest_path(source, target):
     explored = set()
     while True:
         if frontier.empty():
-            raise Exception("no solution")
+            return None
         
         node = frontier.remove()
         num_explored += 1
 
         if node.state == target:
-            raise Exception("FOUND SOLUTION1")
+            path = []
+            while node.parent is not None:
+                path.append((node.action,node.state))
+                node = node.parent
+            path.reverse()
+            #print(path)
+            return path
 
         explored.add(node.state)
 
