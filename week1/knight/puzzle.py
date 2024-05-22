@@ -11,6 +11,14 @@ CKnave = Symbol("C is a Knave")
 
 # Puzzle 0
 # A says "I am both a knight and a knave."
+
+#1.A is either a knight xor a knave 
+#2.Knight implies truth
+#3.Knave implies falsehood
+#A contridicts 1 thus statement is a false
+#if statement is false then A lied
+#thuse a is a knave
+
 knowledge0 = And(
     # TODO
 )
@@ -18,6 +26,18 @@ knowledge0 = And(
 # Puzzle 1
 # A says "We are both knaves."
 # B says nothing.
+
+#1.A person is either a knight xor a knave 
+#2.Knight implies truth
+#3.Knave implies falsehood
+#A says we are both knaves
+#if a is a knight it must tell the true
+#thus we are both knaves is a contradiction and a cant be a knight
+#if a is a knave the statement must be false
+#aknave ^ bknave one must be false
+#aknave is true thuse bknave is false
+#if b is not a knave he must be aknight
+
 knowledge1 = And(
     # TODO
 )
@@ -25,6 +45,15 @@ knowledge1 = And(
 # Puzzle 2
 # A says "We are the same kind."
 # B says "We are of different kinds."
+
+#1.A person is either a knight xor a knave 
+#2.Knight implies truth
+#3.Knave implies falsehood
+#A says we are the same kind thus aknight ^ bknight or aknave ^ bknave
+#aknave ^ bknave cant be true because then a would have to b lying
+#B says they are different thus Aknave ^ bknight or b is lying and is a knave
+#aknave ^ bknave cant be true if b is true thus a is lying thus b is telling the truth aknave and bknight
+
 knowledge2 = And(
     # TODO
 )
@@ -34,6 +63,12 @@ knowledge2 = And(
 # B says "A said 'I am a knave'."
 # B says "C is a knave."
 # C says "A is a knight."
+
+#b said a said i am a knave whihc a did not say thus b is a knave
+#b says c is a knave since b is a knave it must be false and c must be a knight
+#since c is a knight his statement must be true thus a is a knight
+#a statement is true
+
 knowledge3 = And(
     # TODO
 )
