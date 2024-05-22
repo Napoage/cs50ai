@@ -20,7 +20,10 @@ CKnave = Symbol("C is a Knave")
 #thuse a is a knave
 
 knowledge0 = And(
-    # TODO
+    Or(AKnight, AKnave),
+    Not(And(AKnight, AKnave)),
+    Implication(AKnight,And(AKnight, AKnave)),
+    Implication(AKnight,Not(And(AKnight, AKnave)))
 )
 
 # Puzzle 1
@@ -39,7 +42,11 @@ knowledge0 = And(
 #if b is not a knave he must be aknight
 
 knowledge1 = And(
-    # TODO
+    Or(AKnight, AKnave),
+    Not(And(AKnight, AKnave)),
+    Implication(AKnight,And(AKnave, BKnave)),
+    Implication(AKnave,Not(And(AKnave,BKnave))),
+    Implication(Implication(AKnave,Not(And(AKnave,BKnave))),Or(AKnight,BKnight))     
 )
 
 # Puzzle 2
