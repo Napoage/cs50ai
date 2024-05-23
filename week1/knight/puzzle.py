@@ -44,6 +44,8 @@ knowledge0 = And(
 knowledge1 = And(
     Or(AKnight, AKnave),
     Not(And(AKnight, AKnave)),
+    Or(BKnight, BKnave),
+    Not(And(BKnight, BKnave)),
     Implication(AKnight,And(AKnave, BKnave)),
     Implication(AKnave,Not(And(AKnave,BKnave))),
     Implication(Implication(AKnave,Not(And(AKnave,BKnave))),Or(AKnight,BKnight))     
@@ -60,9 +62,17 @@ knowledge1 = And(
 #aknave ^ bknave cant be true because then a would have to b lying
 #B says they are different thus Aknave ^ bknight or b is lying and is a knave
 #aknave ^ bknave cant be true if b is true thus a is lying thus b is telling the truth aknave and bknight
-
+#~(Aknight^BKnight)
+#~Aknight or ~Bknight
 knowledge2 = And(
-    # TODO
+    Or(AKnight, AKnave),
+    Not(And(AKnight, AKnave)),
+    Or(BKnight, BKnave),
+    Not(And(BKnight, BKnave)),
+    Implication(AKnight, Or(And(AKnight, BKnight),And(AKnave,BKnave))),
+    Implication(AKnave, Not(Or(And(AKnight, BKnight),And(AKnave,BKnave)))),
+    Implication(BKnave, Or(And(AKnight, BKnight),And(AKnave,BKnave))),
+    Implication(BKnight, Not(Or(And(AKnight, BKnight),And(AKnave,BKnave))))
 )
 
 # Puzzle 3
@@ -77,7 +87,24 @@ knowledge2 = And(
 #a statement is true
 
 knowledge3 = And(
-    # TODO
+    Or(AKnight, AKnave),
+    Not(And(AKnave, AKnight)),
+
+    Or(BKnight, BKnave),
+    Not(And(BKnave, BKnight)),
+
+    Or(CKnight, CKnave),
+    Not(And(CKnave, CKnight)),
+
+    Implication(BKnave, CKnight),
+    Implication(BKnight, CKnave),
+
+    Implication(CKnight, AKnight),
+    Implication(CKnave, AKnave),
+
+    Implication(BKnight, Biconditional(AKnight,AKnave)),
+    Implication(BKnave, Not(Biconditional(AKnight, AKnave))),
+
 )
 
 
