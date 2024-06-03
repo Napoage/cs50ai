@@ -211,30 +211,31 @@ class MinesweeperAI():
         sentence = Sentence(cells, count)
 
         self.knowledge.append(sentence)
-        #could create a set of all cells that are safe and all cells that are mines
-        #then mark them later instead of the continous for loops
-        for i in self.knowledge:
-            safe_copy = i.known_safes().copy()
-            for cell in safe_copy:
-                self.mark_safe(cell)
-            mine_copy = i.known_mines().copy()
-            for cell in mine_copy:
-                self.mark_mine(cell)
+        
+        while True:
+            tempKnowledge = self.knowledge.copy()
+            for i in self.knowledge:
+                safe_copy = i.known_safes().copy()
+                for cell in safe_copy:
+                    self.mark_safe(cell)
+                mine_copy = i.known_mines().copy()
+                for cell in mine_copy:
+                    self.mark_mine(cell)
 
-        # Need to change this before submitting 
-        # not removing at correct rate the knowledge base gets too large 
-        #and slows down the game I think it has to do with the above section
-        empty = Sentence(set(), 0)
+            for i in self.knowledge:
+                if i.cells == set():
+                    self.knowledge.remove(i)
 
-        self.knowledge[:] = [x for x in self.knowledge if x != empty]
-
-        sentences = []
-        for i in self.knowledge:
-            for k in self.knowledge:
-                if i.cells.issubset(k.cells):
-                    new_sentence = Sentence(k.cells - i.cells, k.count - i.count)
-                    sentences.append(new_sentence)
-        self.knowledge += sentences
+            sentences = []
+            for i in self.knowledge:
+                for k in self.knowledge:
+                    if i.cells.issubset(k.cells) and i != k:
+                        new_sentence = Sentence(k.cells - i.cells, k.count - i.count)
+                        if new_sentence not in self.knowledge:
+                            sentences.append(new_sentence)
+            self.knowledge += sentences
+            if tempKnowledge == self.knowledge:
+                break
 
     def neighbors(self, cell, count):
         neighbors = set()
