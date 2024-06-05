@@ -68,25 +68,25 @@ def transition_model(corpus, page, damping_factor):
     For example, if the corpus were {"1.html": {"2.html", "3.html"}, "2.html": {"3.html"}, "3.html": {"2.html"}}, the page was "1.html", and the damping_factor was 0.85, then the output of transition_model should be {"1.html": 0.05, "2.html": 0.475, "3.html": 0.475}. This is because with probability 0.85, we choose randomly to go from page 1 to either page 2 or page 3 (so each of page 2 or page 3 has probability 0.425 to start), but every page gets an additional 0.05 because with probability 0.15 we choose randomly among all three of the pages.
     If page has no outgoing links, then transition_model should return a probability distribution that chooses randomly among all pages with equal probability. (In other words, if a page has no links, we can pretend it has links to all pages in the corpus, including itself.)
     """
-    print("corpus: ", corpus)
-    print("page: ", page)
-    print("damping_factor: ", damping_factor)
-    print("corpus[page]: ", corpus[page])
-
     pageProb = dict()
+
     for i in corpus:
         pageProb[i] = 0
+
     for j in corpus[page]:
         pageProb[j] = damping_factor / len(corpus[page])
+
     for k in corpus:
         pageProb[k] += (1 - damping_factor) / len(corpus)
+
     if len(corpus[page]) == 0:
         for l in corpus:
             pageProb[l] = 1 / len(corpus)
-    print("pageProb: ", pageProb)
+            
     sum = 0
     for m in pageProb:
         sum += pageProb[m]
+        
     if sum < .999 or sum > 1.001:
         raise ValueError("sum of pageProb is not 1")
     return pageProb
@@ -113,28 +113,32 @@ def sample_pagerank(corpus, damping_factor, n):
     For example, if the transition probabilities are {"1.html": 0.05, "2.html": 0.475, "3.html": 0.475}, then 5% of the time the next sample generated should be "1.html", 47.5% of the time the next sample generated should be "2.html", and 47.5% of the time the next sample generated should be "3.html".
     You may assume that n will be at least 1.
     """
-    print("corpus: ", corpus)
-    print("damping_factor: ", damping_factor)
-    print("n: ", n)
     sample = dict()
     tempdict = dict()
+
     for i in corpus:
         sample[i] = 0
+
     tempdict = transition_model(corpus, random.choice(list(corpus.keys())), damping_factor)
+
     for i in sample:
             sample[i] += tempdict[i]
+
     for j in range(n-1):
         tempdict = transition_model(corpus, random.choices(list(tempdict.keys()), weights=list(tempdict.values()))[0], damping_factor)
         for i in sample:
             sample[i] += tempdict[i]
+
     for k in sample:
         sample[k] /= n
-    print("sample: ", sample)
+
     sum = 0
     for l in sample:
         sum += sample[l]
+
     if sum < .999 or sum > 1.001:
         raise ValueError("sum of sample is not 1")
+    
     return sample
 
 
@@ -175,34 +179,37 @@ def iterate_pagerank(corpus, damping_factor):
 
     In this project, you’ll implement both such approaches for calculating PageRank – calculating both by sampling pages from a Markov Chain random surfer and by iteratively applying the PageRank formula.
     """
-    print("corpus: ", corpus)
-    print("damping_factor: ", damping_factor)
+
     iterate = dict()
     for i in corpus:
         iterate[i] = 1 / len(corpus)
+
     while True:
-        temp = dict()
-        for i in iterate:
-            temp[i] = calculatePr(iterate, i)
+        temp = iterate.copy()
+        for i in corpus:
+            probability = 0
+            for z in corpus:
+                if i in corpus[z]:
+                    probability += temp[z] / len(corpus[z])
+                elif len(corpus[z]) == 0:
+                    probability += 1 / len(corpus)
+            iterate[i] = ((1 - damping_factor) / len(corpus)) + (damping_factor * probability)
         endLoop = True
+
         for i in iterate:
             if abs(iterate[i] - temp[i]) < .001:
-                endLoop = True
+                continue
             else:
-                 endLoop = False
-        iterate = temp
+                endLoop = False
         if endLoop:
             break
+
     sum = 0
     for l in iterate:
         sum += iterate[l]
     if sum < .999 or sum > 1.001:
         raise ValueError("sum of sample is not 1")
+    
     return iterate
-
-def calculatePr(corpus, page,damping_factor = 0.85):
-    return (1-damping_factor)/len(corpus) + (damping_factor * sum(corpus[page] / NumLinks(corpus,page))) ##need to fix recursion issue
-def NumLinks(corpus, page):
-    return len(corpus[page])
 if __name__ == "__main__":
     main()
