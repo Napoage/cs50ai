@@ -86,7 +86,7 @@ def transition_model(corpus, page, damping_factor):
     sum = 0
     for m in pageProb:
         sum += pageProb[m]
-        
+
     if sum < .999 or sum > 1.001:
         raise ValueError("sum of pageProb is not 1")
     return pageProb
@@ -208,7 +208,8 @@ def iterate_pagerank(corpus, damping_factor):
     for l in iterate:
         sum += iterate[l]
     if sum < .999 or sum > 1.001:
-        raise ValueError("sum of sample is not 1")
+        for i in iterate:
+            iterate[i] /= sum
     
     return iterate
 if __name__ == "__main__":
