@@ -128,7 +128,12 @@ class CrosswordCreator():
         The domain of y should be left unmodified.
         The function should return True if a revision was made to the domain of x; it should return False if no revision was made.
         """
-        raise NotImplementedError
+        revised = False
+        for var1 in self.crossword.variables:
+            for var2 in self.crossword.varibales:
+                if self.crossword.overlaps[var1,var2] is not None:
+                    print("Overlap" + self.crossword.overlaps[var1,var2])
+        return revised
 
     def ac3(self, arcs=None):
         """
@@ -146,7 +151,21 @@ class CrosswordCreator():
         If, in the process of enforcing arc consistency, you remove all of the remaining values from a domain, return False (this means it’s impossible to solve the problem, since there are no more possible values for the variable). Otherwise, return True.
         You do not need to worry about enforcing word uniqueness in this function (you’ll implement that check in the consistent function.)
         """
-        raise NotImplementedError
+        arc_consistent = False
+        if arcs is None:
+            for var1 in self.crossword.variables:
+                for var2 in self.crossword.variables:
+                    if var1 != var2:
+                        arcs.append((var1,var2))
+        while len(arcs) > 0:
+            var1, var2 = arcs.pop(0)
+            if self.revise(var1,var2):
+                if len(self.domains[var1]) == 0:
+                    return False
+                for var3 in self.crossword.variables:
+                    if var3 != var1:
+                        arcs.append((var3,var1))
+        return arc_consistent
 
     def assignment_complete(self, assignment):
         """
