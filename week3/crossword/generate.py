@@ -151,7 +151,6 @@ class CrosswordCreator():
         If, in the process of enforcing arc consistency, you remove all of the remaining values from a domain, return False (this means it’s impossible to solve the problem, since there are no more possible values for the variable). Otherwise, return True.
         You do not need to worry about enforcing word uniqueness in this function (you’ll implement that check in the consistent function.)
         """
-        arc_consistent = False
         if arcs is None:
             for var1 in self.crossword.variables:
                 for var2 in self.crossword.variables:
@@ -165,7 +164,7 @@ class CrosswordCreator():
                 for var3 in self.crossword.variables:
                     if var3 != var1:
                         arcs.append((var3,var1))
-        return arc_consistent
+        return True
 
     def assignment_complete(self, assignment):
         """
@@ -177,7 +176,10 @@ class CrosswordCreator():
         An assignment is complete if every crossword variable is assigned to a value (regardless of what that value is).
         The function should return True if the assignment is complete and return False otherwise.
         """
-        raise NotImplementedError
+        for var in self.crossword.variables:
+            if var not in assignment.keys() or assignment[var] == None:
+                return False
+        return True
 
     def consistent(self, assignment):
         """
@@ -186,10 +188,26 @@ class CrosswordCreator():
         The consistent function should check to see if a given assignment is consistent.
 
         An assignment is a dictionary where the keys are Variable objects and the values are strings representing the words those variables will take on. Note that the assignment may not be complete: not all variables will necessarily be present in the assignment.
-        An assignment is consistent if it satisfies all of the constraints of the problem: that is to say, all values are distinct, every value is the correct length, and there are no conflicts between neighboring variables.
+        An assignment is consistent if it satisfies all of the constraints of the problem: 
+        that is to say, all values are distinct, every value is the correct length, and there are no conflicts between neighboring variables.
         The function should return True if the assignment is consistent and return False otherwise.
         """
-        raise NotImplementedError
+        is_consistent = True
+        is_consistent = self.assignment_complete(assignment)
+        if is_consistent:
+            for var1 in assignment:
+              for var2 in assignment:
+                if var1 != var2:
+                    if var1.length != len(assignment[var1]) or var2.length != len(assignment[var2]):
+                        return False
+                    else:
+                        if self.crossword.overlaps[var1,var2] is not None:
+                            i,j = self.crossword.overlaps[var1,var2]
+                            if assignment[var1][i] != assignment[var2][j]:
+                                return False
+        else:
+            return False
+        return True
 
     def order_domain_values(self, var, assignment):
         """
