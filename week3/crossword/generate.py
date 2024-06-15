@@ -130,9 +130,18 @@ class CrosswordCreator():
         """
         revised = False
         for var1 in self.crossword.variables:
-            for var2 in self.crossword.varibales:
-                if self.crossword.overlaps[var1,var2] is not None:
-                    print("Overlap" + self.crossword.overlaps[var1,var2])
+            for var2 in self.crossword.variables:
+                if var1 != var2:
+                    if self.crossword.overlaps[var1,var2] is not None:
+                        for overlaps in self.crossword.overlaps[var1,var2]:
+                            overlap_var1,overlap_var2 = overlaps
+                            for word_var1 in self.domains[var1]:
+                                for word_var2 in self.domains[var2]:
+                                    if word_var1[overlap_var1] == word_var2[overlap_var2]:
+                                        continue
+                                    else:
+                                        self.domains[var1].remove(word_var1)
+                                        revised = True
         return revised
 
     def ac3(self, arcs=None):
@@ -152,6 +161,7 @@ class CrosswordCreator():
         You do not need to worry about enforcing word uniqueness in this function (you’ll implement that check in the consistent function.)
         """
         if arcs is None:
+            arcs = []
             for var1 in self.crossword.variables:
                 for var2 in self.crossword.variables:
                     if var1 != var2:
@@ -225,7 +235,8 @@ class CrosswordCreator():
         It may be helpful to first implement this function by returning a list of values in any arbitrary order (which should still generate correct crossword puzzles). Once your algorithm is working, you can then go back and ensure that the values are returned in the correct order.
         You may find it helpful to sort a list according to a particular key: Python contains some helpful functions for achieving this.
         """
-        raise NotImplementedError
+        
+        return list(self.domains[var])
 
     def select_unassigned_variable(self, assignment):
         """
@@ -242,7 +253,10 @@ class CrosswordCreator():
         It may be helpful to first implement this function by returning any arbitrary unassigned variable (which should still generate correct crossword puzzles). Once your algorithm is working, you can then go back and ensure that you are returning a variable according to the heuristics.
         You may find it helpful to sort a list according to a particular key: Python contains some helpful functions for achieving this.
         """
-        raise NotImplementedError
+        for var in self.crossword.variables:
+            if var not in assignment:
+                return var
+        return None
 
     def backtrack(self, assignment):
         """
@@ -259,9 +273,18 @@ class CrosswordCreator():
         If it is possible to generate a satisfactory crossword puzzle, your function should return the complete assignment: a dictionary where each variable is a key and the value is the word that the variable should take on. If no satisfying assignment is possible, the function should return None.
         If you would like, you may find that your algorithm is more efficient if you interleave search with inference (as by maintaining arc consistency every time you make a new assignment). You are not required to do this, but you are permitted to, so long as your function still produces correct results. (It is for this reason that the ac3 function allows an arcs argument, in case you’d like to start with a different queue of arcs.)
         """
-        raise NotImplementedError
-
-
+        if len(assignment) == len(self.crossword.variables):
+            return assignment
+        var = select_unassigned_variables(assignment)
+        for value in self.domains[var]:
+            new_assignment = assignment.copy()
+            new_assignment[var] = value
+            if consistent(new_assignment):
+                result = backtrack(new_assignment)
+                if result is not None:
+                    return result
+        return None 
+    
 def main():
 
     # Check usage
