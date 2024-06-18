@@ -287,9 +287,13 @@ class CrosswordCreator():
         You may find it helpful to sort a list according to a particular key: Python contains some helpful functions for achieving this.
         """
         print("In select_unassigned_variable")
+        unused_vars = []
         for var in self.crossword.variables:
             if var not in assignment:
-                return var
+                unused_vars.append(var)
+        sorted_vars = sorted(unused_vars, key=lambda var: (len(self.domains[var]), -len(self.crossword.neighbors(var))))
+        if len(sorted_vars) > 0:
+            return sorted_vars[0]
         return None
 
     def backtrack(self, assignment):
