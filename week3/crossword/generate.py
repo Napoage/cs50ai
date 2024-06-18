@@ -211,15 +211,19 @@ class CrosswordCreator():
         print()
         print()
         print("In assignment_complete")
+        in_assignment = []
         for var in self.crossword.variables:
             print("Var: ", var)
-            if var not in assignment.keys() or assignment[var] == None:
+            if var not in assignment.keys() or assignment[var] == None or assignment[var] in in_assignment:
                 if var not in assignment.keys():
                     print("var not in assignment.keys()")
                 elif assignment[var] == None:
                     print("assignment[var] == None")
+                elif assignment[var] in in_assignment:
+                    print("assignment[var] in in_assignment")
                 print("Returning False")
                 return False
+            in_assignment.append(assignment[var])
         print("Returning True")
         return True
 
@@ -234,22 +238,32 @@ class CrosswordCreator():
         that is to say, all values are distinct, every value is the correct length, and there are no conflicts between neighboring variables.
         The function should return True if the assignment is consistent and return False otherwise.
         """
+        # TODO add check for word uniqueness
         print()
         print()
         print("In consistent")
         is_consistent = True
         is_consistent = self.assignment_complete(assignment)
+        assigned_words = set()
+        for var1 in assignment:
+            if assignment[var1] in assigned_words:
+                print("Returning False in consistent: Duplicate word found")
+                return False
+            assigned_words.add(assignment[var1])
         if is_consistent is False:
             for var1 in assignment:
               for var2 in assignment:
                 if var1 != var2:
                     if var1.length != len(assignment[var1]) or var2.length != len(assignment[var2]):
+                        print("Returning False in consistent")
                         return False
                     else:
                         if self.crossword.overlaps[var1,var2] is not None:
                             i,j = self.crossword.overlaps[var1,var2]
                             if assignment[var1][i] != assignment[var2][j]:
+                                print("Returning False in consistent")
                                 return False
+        print("Returning True in consistent")
         return True
 
     def order_domain_values(self, var, assignment):
