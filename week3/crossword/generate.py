@@ -104,10 +104,14 @@ class CrosswordCreator():
         To remove a value x from the domain of a variable v, since self.domains is a dictionary mapping variables to sets of values, you can call self.domains[v].remove(x).
         No return value is necessary for this function.
         """
+        print("In enforce_node_consistency")
+        print(self.domains)
         for variable in self.crossword.variables:
             for word in self.crossword.words:
                 if len(word) != variable.length:
+                    print("Removing word: ", word , " from variable: ", variable)
                     self.domains[variable].remove(word)
+        print(self.domains)
 
 
 
@@ -128,20 +132,29 @@ class CrosswordCreator():
         The domain of y should be left unmodified.
         The function should return True if a revision was made to the domain of x; it should return False if no revision was made.
         """
+        print()
+        print("In revise")
         revised = False
-        for var1 in self.crossword.variables:
-            for var2 in self.crossword.variables:
-                if var1 != var2:
-                    if self.crossword.overlaps[var1,var2] is not None:
-                        for overlaps in self.crossword.overlaps[var1,var2]:
-                            overlap_var1,overlap_var2 = overlaps
-                            for word_var1 in self.domains[var1]:
-                                for word_var2 in self.domains[var2]:
-                                    if word_var1[overlap_var1] == word_var2[overlap_var2]:
-                                        continue
-                                    else:
-                                        self.domains[var1].remove(word_var1)
-                                        revised = True
+        to_remove = set()
+        print("x: ", x, " y: ", y)
+        if self.crossword.overlaps[x,y] is not None:
+            print("Overlaps: ", self.crossword.overlaps[x,y])
+            (i,j) = self.crossword.overlaps[x,y]
+            for word_var1 in self.domains[x]:
+                for word_var2 in self.domains[y]:
+                    print("Comparing: ", word_var1, word_var2)
+                    if word_var1[i] == word_var2[j]:
+                        if word_var1 in to_remove:
+                            to_remove.remove(word_var1)
+                        break
+                    else:
+                        print("Removing word: ", word_var1)
+                        to_remove.add(word_var1)
+            for word in to_remove:
+                print("Removing word: ", word, " from variable: ", x)
+                revised = True
+                self.domains[x].remove(word)
+        print("Revised: ", revised)
         return revised
 
     def ac3(self, arcs=None):
@@ -160,19 +173,28 @@ class CrosswordCreator():
         If, in the process of enforcing arc consistency, you remove all of the remaining values from a domain, return False (this means it’s impossible to solve the problem, since there are no more possible values for the variable). Otherwise, return True.
         You do not need to worry about enforcing word uniqueness in this function (you’ll implement that check in the consistent function.)
         """
+        print()
+        print()
+        print("In ac3")
         if arcs is None:
+            print("Arcs is None")
             arcs = []
             for var1 in self.crossword.variables:
                 for var2 in self.crossword.variables:
                     if var1 != var2:
+                        print("Adding arc: ", var1, var2)
                         arcs.append((var1,var2))
         while len(arcs) > 0:
             var1, var2 = arcs.pop(0)
+            print(self.domains[var1])
             if self.revise(var1,var2):
+                print(self.domains[var1])
                 if len(self.domains[var1]) == 0:
+                    print("Returning False")
                     return False
                 for var3 in self.crossword.variables:
                     if var3 != var1:
+                        print("Adding arc: ", var3, var1)
                         arcs.append((var3,var1))
         return True
 
@@ -186,9 +208,19 @@ class CrosswordCreator():
         An assignment is complete if every crossword variable is assigned to a value (regardless of what that value is).
         The function should return True if the assignment is complete and return False otherwise.
         """
+        print()
+        print()
+        print("In assignment_complete")
         for var in self.crossword.variables:
+            print("Var: ", var)
             if var not in assignment.keys() or assignment[var] == None:
+                if var not in assignment.keys():
+                    print("var not in assignment.keys()")
+                elif assignment[var] == None:
+                    print("assignment[var] == None")
+                print("Returning False")
                 return False
+        print("Returning True")
         return True
 
     def consistent(self, assignment):
@@ -202,9 +234,12 @@ class CrosswordCreator():
         that is to say, all values are distinct, every value is the correct length, and there are no conflicts between neighboring variables.
         The function should return True if the assignment is consistent and return False otherwise.
         """
+        print()
+        print()
+        print("In consistent")
         is_consistent = True
         is_consistent = self.assignment_complete(assignment)
-        if is_consistent:
+        if is_consistent is False:
             for var1 in assignment:
               for var2 in assignment:
                 if var1 != var2:
@@ -215,8 +250,6 @@ class CrosswordCreator():
                             i,j = self.crossword.overlaps[var1,var2]
                             if assignment[var1][i] != assignment[var2][j]:
                                 return False
-        else:
-            return False
         return True
 
     def order_domain_values(self, var, assignment):
@@ -235,7 +268,7 @@ class CrosswordCreator():
         It may be helpful to first implement this function by returning a list of values in any arbitrary order (which should still generate correct crossword puzzles). Once your algorithm is working, you can then go back and ensure that the values are returned in the correct order.
         You may find it helpful to sort a list according to a particular key: Python contains some helpful functions for achieving this.
         """
-        
+        print("In order_domain_values")
         return list(self.domains[var])
 
     def select_unassigned_variable(self, assignment):
@@ -253,6 +286,7 @@ class CrosswordCreator():
         It may be helpful to first implement this function by returning any arbitrary unassigned variable (which should still generate correct crossword puzzles). Once your algorithm is working, you can then go back and ensure that you are returning a variable according to the heuristics.
         You may find it helpful to sort a list according to a particular key: Python contains some helpful functions for achieving this.
         """
+        print("In select_unassigned_variable")
         for var in self.crossword.variables:
             if var not in assignment:
                 return var
@@ -273,14 +307,22 @@ class CrosswordCreator():
         If it is possible to generate a satisfactory crossword puzzle, your function should return the complete assignment: a dictionary where each variable is a key and the value is the word that the variable should take on. If no satisfying assignment is possible, the function should return None.
         If you would like, you may find that your algorithm is more efficient if you interleave search with inference (as by maintaining arc consistency every time you make a new assignment). You are not required to do this, but you are permitted to, so long as your function still produces correct results. (It is for this reason that the ac3 function allows an arcs argument, in case you’d like to start with a different queue of arcs.)
         """
+        print()
+        print()
+        print("In backtrack")
+
         if len(assignment) == len(self.crossword.variables):
+            print("Returning assignment")
+            print(assignment)
             return assignment
-        var = select_unassigned_variables(assignment)
+        var = self.select_unassigned_variable(assignment)
+        print("Var: ", var)
         for value in self.domains[var]:
+            print("Value: ", value)
             new_assignment = assignment.copy()
             new_assignment[var] = value
-            if consistent(new_assignment):
-                result = backtrack(new_assignment)
+            if self.consistent(new_assignment):
+                result = self.backtrack(new_assignment)
                 if result is not None:
                     return result
         return None 
