@@ -59,15 +59,59 @@ def load_data(filename):
     labels should be the corresponding list of labels, where each label
     is 1 if Revenue is true, and 0 otherwise.
     """
-    raise NotImplementedError
+    months = {
+        'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'June': 5, 'Jul': 6
+         , 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11 
+         }
+    evidence = []
+    labels = []
+    with open(filename, mode='r') as file:
+        reader = csv.reader(file)
+        header = next(reader)
+
+        for row in reader:
+            administrative = int(row[0])
+            administrative_Duration = float(row[1])
+            informational = int(row[2])
+            informational_Duration = float(row[3])
+            productRelated = int(row[4])
+            productRelated_Duration = float(row[5])
+            bounceRates = float(row[6])
+            exitRates = float(row[7])
+            pageValues = float(row[8])
+            specialDay = float(row[9])
+            month = months[row[10]] #convert month to int 0 through 12
+            operatingSystems = int(row[11])
+            browser = int(row[12])
+            region = int(row[13])
+            trafficType = int(row[14])
+            print(row[15],row[16],row[17])
+            visitorType = 1 if row[15] == "Returning_Visitor" else 0 # convert vistortype to int -> , an integer 0 (not returning) or 1 (returning)
+            weekend = 1 if row[16] == "TRUE" else 0 # convert weekend to int ->, an integer 0 (if false) or 1 (if true)
+            #getting bool wrong
+            label = 1 if row[17] == "TRUE" else 0
+            print(visitorType, weekend, label)
+
+            evidence_row = [
+                administrative, administrative_Duration, informational, informational_Duration, productRelated, productRelated_Duration, 
+                bounceRates, exitRates, pageValues,specialDay, month, operatingSystems, browser, region, trafficType, visitorType, weekend
+            ]
+            evidence.append(evidence_row)
+            labels.append(label)
+    return evidence, labels
 
 
 def train_model(evidence, labels):
     """
     Given a list of evidence lists and a list of labels, return a
     fitted k-nearest neighbor model (k=1) trained on the data.
+
+    The train_model function should accept a list of evidence and a list of labels, and return a scikit-learn nearest-neighbor classifier (a k-nearest-neighbor classifier where k = 1) fitted on that training data.
+    Notice that we’ve already imported for you from sklearn.neighbors import KNeighborsClassifier. You’ll want to use a KNeighborsClassifier in this function.
     """
-    raise NotImplementedError
+    model = KNeighborsClassifier(n_neighbors=1)
+    model.fit(evidence, labels)
+    return model
 
 
 def evaluate(labels, predictions):
@@ -85,7 +129,23 @@ def evaluate(labels, predictions):
     representing the "true negative rate": the proportion of
     actual negative labels that were accurately identified.
     """
-    raise NotImplementedError
+    sensitivity = 0.0
+    total_Positive = 0
+    specificity = 0.0
+    total_Negative = 0
+    for label,prediction in zip(labels,predictions):
+        if label == 1:
+            total_Positive+=1 
+            if prediction == 1:
+                sensitivity+=1
+        else:
+            total_Negative+=1
+            if prediction == 0:
+                specificity+=1
+    sensitivity = sensitivity/total_Positive if total_Positive>0 else 0
+    specificity = specificity/total_Negative if total_Negative>0 else 0
+            
+    return sensitivity, specificity
 
 
 if __name__ == "__main__":
