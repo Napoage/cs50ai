@@ -243,16 +243,15 @@ class CrosswordCreator():
         print()
         print("In consistent")
         is_consistent = True
-        is_consistent = self.assignment_complete(assignment)
         assigned_words = set()
         for var1 in assignment:
             if assignment[var1] in assigned_words:
                 print("Returning False in consistent: Duplicate word found")
                 return False
             assigned_words.add(assignment[var1])
-        if is_consistent is False:
-            for var1 in assignment:
-              for var2 in assignment:
+        #if is_consistent is False:
+        for var1 in assignment:
+            for var2 in assignment:
                 if var1 != var2:
                     if var1.length != len(assignment[var1]) or var2.length != len(assignment[var2]):
                         print("Returning False in consistent")
@@ -263,6 +262,7 @@ class CrosswordCreator():
                             if assignment[var1][i] != assignment[var2][j]:
                                 print("Returning False in consistent")
                                 return False
+        is_consistent = self.assignment_complete(assignment)
         print("Returning True in consistent")
         return True
 
