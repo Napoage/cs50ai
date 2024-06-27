@@ -238,7 +238,7 @@ class CrosswordCreator():
         that is to say, all values are distinct, every value is the correct length, and there are no conflicts between neighboring variables.
         The function should return True if the assignment is consistent and return False otherwise.
         """
-        # TODO add check for word uniqueness
+        #why failing two test cases
         print()
         print()
         print("In consistent")
