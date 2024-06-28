@@ -75,13 +75,11 @@ def preprocess(sentence):
     Any word that doesn’t contain at least one alphabetic character (e.g. . or 28) should be excluded from the returned list.
     """
     words = nltk.word_tokenize(sentence)
+    processed = []
     for i in range(len(words)):
         if words[i].isalpha():
-            words[i] = words[i].lower()
-        else:
-            words.pop(i)
-    print(words)
-    return words
+            processed.append(words[i].lower())
+    return processed
 
 
 def np_chunk(tree):
@@ -112,7 +110,8 @@ def np_chunk(tree):
     for subtree in tree.subtrees():
         if subtree.label() == "NP":
             if subtree.subtrees() != "NP":
-                nps.append(subtree)       
+                nps.append(subtree)
+    #doesnt check all subtrees subtrees       
         #print(subtree)
     
     return nps
