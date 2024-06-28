@@ -90,12 +90,11 @@ def visualize_attentions(tokens, attentions):
     The generate_diagram function expects the first two inputs to be the layer number and the head number. These numbers should be 1-indexed. In other words, for the first attention head and attention layer (each of which has index 0), layer_number should be 1 and head_number should be 1 as well.
     """
     # TODO: Update this function to produce diagrams for all layers and heads.
-    generate_diagram(
-        1,
-        1,
-        tokens,
-        attentions[0][0][0]
-    )
+    #print(attentions[0][0][0])
+    for i in range(len(attentions)):
+        for j in range(len(attentions[i])):
+            for k in range(len(attentions[i][j])):
+                generate_diagram(i+1, k+1, tokens, attentions[i][0][k])
 
 
 def generate_diagram(layer_number, head_number, tokens, attention_weights):
