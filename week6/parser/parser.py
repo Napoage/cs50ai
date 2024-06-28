@@ -15,8 +15,14 @@ V -> "smiled" | "tell" | "were"
 """
 
 NONTERMINALS = """
-S -> N V
+S -> NP VP
+NP -> N | Det N | Det AP N | N PP | NP Conj NP
+VP -> V | V NP | V NP PP | VP Conj VP | VP Conj S | VP PP | VP AdvP | VP NP AdvP | AdvP VP
+AP -> Adj | Adj AP
+AdvP -> Adv | Adv AdvP
+PP -> P NP
 """
+# NEED TO ADD MORE NONTERMINALS
 
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)
 parser = nltk.ChartParser(grammar)
@@ -61,8 +67,21 @@ def preprocess(sentence):
     Pre-process sentence by converting all characters to lowercase
     and removing any word that does not contain at least one alphabetic
     character.
+
+    The preprocess function should accept a sentence as input and return a lowercased list of its words.
+    You may assume that sentence will be a string.
+    You should use nltk’s word_tokenize function to perform tokenization.
+    Your function should return a list of words, where each word is a lowercased string.
+    Any word that doesn’t contain at least one alphabetic character (e.g. . or 28) should be excluded from the returned list.
     """
-    raise NotImplementedError
+    words = nltk.word_tokenize(sentence)
+    for i in range(len(words)):
+        if words[i].isalpha():
+            words[i] = words[i].lower()
+        else:
+            words.pop(i)
+    print(words)
+    return words
 
 
 def np_chunk(tree):
@@ -71,8 +90,32 @@ def np_chunk(tree):
     A noun phrase chunk is defined as any subtree of the sentence
     whose label is "NP" that does not itself contain any other
     noun phrases as subtrees.
+
+    The np_chunk function should accept a tree representing the syntax of a sentence, and return a list of all of the noun phrase chunks in that sentence.
+    For this problem, a “noun phrase chunk” is defined as a noun phrase that doesn’t contain other noun phrases within it. Put more formally, a noun phrase chunk is a subtree of the original tree whose label is NP and that does not itself contain other noun phrases as subtrees.
+    For example, if "the home" is a noun phrase chunk, then "the armchair in the home" is not a noun phrase chunk, because the latter contains the former as a subtree.
+    You may assume that the input will be a nltk.tree object whose label is S (that is to say, the input will be a tree representing a sentence).
+    Your function should return a list of nltk.tree objects, where each element has the label NP.
+    You will likely find the documentation for nltk.tree helpful for identifying how to manipulate a nltk.tree object.
     """
-    raise NotImplementedError
+    # can use label to test if it is a NP
+    # ex tree.label() == "NP"
+    nps = []
+    """for node in tree:
+        print("nodes: ", node)
+        if node.label() == "NP":
+            #print("NP: ", node)
+            if node.subtrees() != "NP":
+                nps.append(node)
+                #print("NP: with no subtree", node)
+                """
+    for subtree in tree.subtrees():
+        if subtree.label() == "NP":
+            if subtree.subtrees() != "NP":
+                nps.append(subtree)       
+        #print(subtree)
+    
+    return nps
 
 
 if __name__ == "__main__":
