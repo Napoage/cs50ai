@@ -109,13 +109,20 @@ def np_chunk(tree):
                 """
     for subtree in tree.subtrees():
         if subtree.label() == "NP":
-            if subtree.subtrees() != "NP":
+            if not contains_np(subtree):
                 nps.append(subtree)
     #doesnt check all subtrees subtrees       
         #print(subtree)
     
     return nps
-
-
+def contains_np(subtree):
+    for sub in subtree.subtrees():
+        if sub == subtree:
+            continue
+        if sub.label() == "NP":
+            return True
+        if contains_np(sub):
+            return True
+    return False
 if __name__ == "__main__":
     main()
